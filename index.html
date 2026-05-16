@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grand Prix — Jimena · Día del Publicista 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim: #8B6914;
+      --cream: #F5EFE0;
+      --dark: #0A0806;
+      --dark2: #141008;
+      --dark3: #1E1810;
+      --ink: #2A2015;
+      --red: #B03A2E;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'DM Mono', monospace;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s;
+      opacity: 0.6;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* ─── INTRO OVERLAY ─── */
+    #intro {
+      position: fixed;
+      inset: 0;
+      background: var(--dark);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #intro.hidden { opacity: 0; visibility: hidden; }
+    .intro-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+    .intro-bar {
+      width: 200px;
+      height: 1px;
+      background: var(--dark3);
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-bar::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      background: var(--gold);
+      animation: loadBar 1.6s ease forwards;
+    }
+    @keyframes loadBar { from { width: 0 } to { width: 100% } }
+    .intro-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--gold-dim);
+      font-style: italic;
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 6vw 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(120px, 22vw, 300px);
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.06);
+      white-space: nowrap;
+      user-select: none;
+      pointer-events: none;
+      letter-spacing: -0.02em;
+    }
+
+    .award-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s 1.8s ease forwards;
+    }
+    .award-badge::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero-category {
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s 2s ease forwards;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(52px, 10vw, 130px);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeUp 0.9s 2.1s ease forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+      display: block;
+    }
+
+    .hero-divider {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeUp 0.8s 2.3s ease forwards;
+    }
+
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(18px, 2.5vw, 26px);
+      font-style: italic;
+      color: rgba(245,239,224,0.65);
+      max-width: 560px;
+      line-height: 1.5;
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeUp 0.8s 2.4s ease forwards;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s 2.6s ease forwards;
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 4px; }
+    .meta-label {
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+    .meta-value {
+      font-size: 13px;
+      color: var(--cream);
+      letter-spacing: 0.05em;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      right: 6vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      animation: fadeUp 0.8s 3s ease forwards;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+    .scroll-text {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      writing-mode: vertical-rl;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4 }
+      50% { opacity: 1 }
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      padding: 100px 6vw;
+      position: relative;
+      border-top: 1px solid rgba(201,168,76,0.08);
+    }
+
+    .section-number {
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .section-number::after {
+      content: '';
+      flex: 1;
+      max-width: 40px;
+      height: 1px;
+      background: var(--gold-dim);
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 50px;
+      letter-spacing: -0.01em;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    /* ─── BRIEF ─── */
+    #brief .brief-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      max-width: 900px;
+    }
+    .brief-cell {
+      background: var(--dark2);
+      padding: 36px;
+      border: 1px solid rgba(201,168,76,0.08);
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+    .brief-cell:hover {
+      border-color: rgba(201,168,76,0.3);
+      background: var(--dark3);
+    }
+    .brief-cell.wide {
+      grid-column: span 2;
+    }
+    .brief-cell-label {
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .brief-cell-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(16px, 2vw, 22px);
+      line-height: 1.5;
+      color: rgba(245,239,224,0.85);
+      font-style: italic;
+    }
+
+    /* ─── INSIGHTS ─── */
+    #insights .insights-list {
+      list-style: none;
+      width: 100%;
+      max-width: 800px;
+      counter-reset: insight;
+    }
+    #insights .insights-list li {
+      counter-increment: insight;
+      display: block;
+      width: 100%;
+      padding: 36px 0;
+      border-bottom: 1px solid rgba(201,168,76,0.08);
+    }
+    #insights .insights-list li::before {
+      content: counter(insight, decimal-leading-zero);
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .insight-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(20px, 2.5vw, 28px);
+      line-height: 1.4;
+      font-style: italic;
+      color: var(--cream);
+    }
+    .insight-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--gold-dim);
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+    }
+
+    /* ─── BIG IDEA ─── */
+    #bigidea {
+      background: var(--dark2);
+      text-align: center;
+      padding: 140px 6vw;
+    }
+    .big-idea-pre {
+      font-size: 10px;
+      letter-spacing: 0.5em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .big-idea-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 8vw, 100px);
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, var(--cream) 30%, var(--gold) 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .big-idea-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(18px, 2.2vw, 24px);
+      font-style: italic;
+      color: rgba(245,239,224,0.6);
+      max-width: 600px;
+      margin: 0 auto 60px;
+      line-height: 1.6;
+    }
+    .big-idea-tag {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      padding: 12px 32px;
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    /* ─── RESULTS / KPIs ─── */
+    #results .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px;
+      margin-top: 10px;
+    }
+    .kpi-card {
+      background: var(--dark2);
+      border: 1px solid rgba(201,168,76,0.08);
+      padding: 40px 30px;
+      transition: border-color 0.3s ease;
+    }
+    .kpi-card:hover { border-color: var(--gold); }
+    .kpi-number {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(42px, 6vw, 70px);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .kpi-label {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      line-height: 1.5;
+    }
+
+    /* ─── TESTIMONIAL ─── */
+    #testimonial {
+      padding: 100px 6vw;
+      max-width: 800px;
+    }
+    .testimonial-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 4.5vw, 54px);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.25;
+      color: var(--cream);
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .testimonial-quote::before {
+      content: '"';
+      font-size: 200px;
+      color: rgba(201,168,76,0.07);
+      position: absolute;
+      top: -60px;
+      left: -20px;
+      font-family: 'Playfair Display', serif;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .testimonial-source {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .testimonial-source::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+    }
+    .testimonial-name {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+    }
+
+    /* ─── AWARD ─── */
+    #award {
+      background: var(--dark2);
+      text-align: center;
+      padding: 120px 6vw 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    .award-circle {
+      width: clamp(240px, 40vw, 420px);
+      height: clamp(240px, 40vw, 420px);
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.15);
+      margin: 0 auto 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+    }
+    .award-circle::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.08);
+    }
+    .award-circle::after {
+      content: '';
+      position: absolute;
+      inset: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.05);
+    }
+    .award-year {
+      font-size: 11px;
+      letter-spacing: 0.5em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+    .award-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 900;
+      font-style: italic;
+      color: var(--gold);
+      line-height: 1;
+      text-align: center;
+      padding: 0 30px;
+    }
+    .award-category-text {
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+    .award-title-main {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 3vw, 32px);
+      font-weight: 300;
+      color: rgba(245,239,224,0.5);
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+    .award-title-main strong {
+      color: var(--cream);
+      font-weight: 700;
+    }
+    .award-cta {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      font-style: italic;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 40px 6vw;
+      border-top: 1px solid rgba(201,168,76,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-brand {
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+    }
+    .footer-copy {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      font-style: italic;
+      color: rgba(245,239,224,0.3);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* responsive */
+    @media (max-width: 640px) {
+      section { padding: 70px 20px; }
+      #hero { padding: 80px 20px 60px; }
+      #brief .brief-grid { grid-template-columns: 1fr; }
+      #brief .brief-cell.wide { grid-column: span 1; }
+      #insights .insights-list,
+      #insights .insights-list li,
+      .insight-text,
+      .insight-sub { width: 100% !important; display: block !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <div class="intro-logo">Pookie Creativos S.A. · Presenta... Te amo mi vida</div>
+    <div class="intro-bar"></div>
+    <div class="intro-text">Cargando el Grand Prix del año...</div>
+  </div>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg-text">JIMENA</div>
+    <div class="award-badge">Grand Prix · Día del Publicista 2025</div>
+    <div class="hero-category">Campaña del Año · Categoría: Vida Real</div>
+    <h1 class="hero-title">
+      Mi campaña<br>
+      <em>favorita</em><br>
+      eres tú.
+    </h1>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">
+      Un case study dedicado a la persona que apareció en Tate Pura Vida
+      y me demostró que la mejor estrategia de comunicación es simplemente ser auténtica.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Cliente</span>
+        <span class="meta-value">Jimena ✦</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Lanzamiento</span>
+        <span class="meta-value">7 dic, 2025</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Agencia</span>
+        <span class="meta-value">El corazón, S.A.</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Premio</span>
+        <span class="meta-value">Grand Prix · Amor</span>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span class="scroll-text">Ver case study</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- BRIEF -->
+  <section id="brief">
+    <div class="section-number">01 · Brief</div>
+    <h2 class="section-title">El <em>encargo</em></h2>
+    <div class="brief-grid reveal">
+      <div class="brief-cell">
+        <div class="brief-cell-label">El reto</div>
+        <div class="brief-cell-value">Encontrar a alguien que llenara los dias de mucho color besitos y apapachos.</div>
+      </div>
+      <div class="brief-cell">
+        <div class="brief-cell-label">Punto de venta</div>
+        <div class="brief-cell-value">Tate Pura Vida. Ahí empezó todo. Osea, literalmente ahí.</div>
+      </div>
+      <div class="brief-cell">
+        <div class="brief-cell-label">Insight del consumidor</div>
+        <div class="brief-cell-value">La gente que estudia publicidad sabe leer entre líneas. No hay forma de hacerle marketing falso a alguien así. Y eso, osea, da miedo y tranquilidad al mismo tiempo.</div>
+      </div>
+      <div class="brief-cell">
+        <div class="brief-cell-label">Restricción creativa</div>
+        <div class="brief-cell-value">Tiene que ser 100% real. Sin stock photos, sin copy genérico y sobre todo lleno de amor.</div>
+      </div>
+      <div class="brief-cell wide">
+        <div class="brief-cell-label">Mandatories</div>
+        <div class="brief-cell-value">Que se sienta especial. Que se sienta vista. Que sepa que desde el 7 de diciembre ha dejado una huella en mi corazon.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section id="insights">
+    <div class="section-number">02 · Insights</div>
+    <h2 class="section-title">Lo que<br><em>descubrimos</em></h2>
+    <ul class="insights-list">
+      <li class="reveal">
+        <span></span>
+        <div>
+          <div class="insight-text">Las personas que estudian publicidad no solo aprenden a vender ideas. Aprenden a ver el mundo de una manera que la mayoría nunca va a entender. Osea, de verdad.</div>
+          <div class="insight-sub">Fuente: cinco meses de observación de campo en Tate Pura Vida y alrededores</div>
+        </div>
+      </li>
+      <li class="reveal">
+        <span></span>
+        <div>
+          <div class="insight-text">Hay una forma en que ella me mira. Esos ojitos de burbuja que me derriten entero y que creo que ella ni sabe que hace. Ese es el mejor call to action que he visto en mi vida.</div>
+          <div class="insight-sub">Fuente: dato que ella desconoce y que hoy se entera</div>
+        </div>
+      </li>
+      <li class="reveal">
+        <span></span>
+        <div>
+          <div class="insight-text">1 día a su lado me bastó para querer quedarme toda la vida. Eso no lo enseña ningún diplomado en publicidad.</div>
+          <div class="insight-sub">Fuente: el equipo creativo (yo), desde el 7 de diciembre</div>
+        </div>
+      </li>
+      <li class="reveal">
+        <span></span>
+        <div>
+          <div class="insight-text">El Día del Publicista existe para celebrar a quienes construyen conexiones entre marcas y personas. Ella lleva meses construyendo una conmigo. Y osea, lo está haciendo increíble.</div>
+          <div class="insight-sub">Fuente: mi corazón, que nunca miente</div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- BIG IDEA -->
+  <section id="bigidea">
+    <div class="big-idea-pre">03 · La Gran Idea</div>
+    <div class="big-idea-headline reveal">
+      "No sos la audiencia.<br>Sos la campaña."
+    </div>
+    <p class="big-idea-body reveal">
+      La mayoría de las campañas buscan llegar a las personas correctas.
+      Esta campaña ya llegó. El objetivo ahora es que no termine.
+    </p>
+    <div class="big-idea-tag reveal">Campaña de largo plazo · Sin fecha de cierre</div>
+  </section>
+
+  <!-- RESULTS / KPIs -->
+  <section id="results">
+    <div class="section-number">04 · Resultados</div>
+    <h2 class="section-title">Los <em>números</em></h2>
+    <div class="kpi-grid">
+      <div class="kpi-card reveal">
+        <div class="kpi-number">7dic</div>
+        <div class="kpi-label">Fecha de lanzamiento. Desde ese día la campaña no ha parado</div>
+      </div>
+      <div class="kpi-card reveal">
+        <div class="kpi-number">∞</div>
+        <div class="kpi-label">Razones para seguir apostando por este proyecto. Osea, infinitas.</div>
+      </div>
+      <div class="kpi-card reveal">
+        <div class="kpi-number">1</div>
+        <div class="kpi-label">Par de ojitos de burbuja capaces de derretirme en cualquier momento</div>
+      </div>
+      <div class="kpi-card reveal">
+        <div class="kpi-number">100%</div>
+        <div class="kpi-label">De recall. No me olvido de ella aunque lo intente. Y no lo voy a intentar. ;)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section id="testimonial">
+    <div class="section-number">05 · Testimonio del Publicista</div>
+    <blockquote class="testimonial-quote reveal">
+      Aca es curioso pq pookie me va a mandar lo que penso al ver esto y espero le encante como a mi jejeje (te amo mi vida)
+    </blockquote>
+    <div class="testimonial-source reveal">
+      <span class="testimonial-name">Pookie Sanchez Campos · Directora creativa de este corazón</span>
+    </div>
+  </section>
+
+  <!-- TESTIMONIO MIGUEL -->
+  <section id="testimonial-miguel" style="border-top: 1px solid rgba(176,58,46,0.15); background: rgba(176,58,46,0.03);">
+    <div class="section-number" style="color: rgba(176,58,46,0.5);">05b · Testimonio del sponsor no solicitado</div>
+    <blockquote class="testimonial-quote reveal" style="font-size: clamp(18px, 3vw, 36px); color: rgba(245,239,224,0.5);">
+      Perrea Babyyyyy. btw vivo dentro de pips.
+    </blockquote>
+    <div class="testimonial-source reveal">
+      <span class="testimonial-name" style="color: rgba(176,58,46,0.6);">Miguel · El perro · Sponsor no autorizado</span>
+    </div>
+  </section>
+
+  <!-- AWARD -->
+  <section id="award">
+    <div class="big-idea-pre" style="margin-bottom: 50px;">06 · El reconocimiento</div>
+    <div class="award-circle reveal">
+      <div class="award-year">7 · dic · 2025</div>
+      <div class="award-name">Jimena</div>
+      <div class="award-category-text">Grand Prix</div>
+    </div>
+    <div class="award-title-main reveal">
+      <strong>Feliz Día del Publicista, amor.</strong>
+    </div>
+    <p class="award-cta reveal">
+      Esta campaña tiene mucho más por contar. Y yo, osea, todo el tiempo del mundo para contarla.
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">El Corazón de Pookie, S.A. · Est. 7 dic 2025 · Tate Pura Vida</div>
+    <div class="footer-copy">Hecho con mucho brief y ningún presupuesto.</div>
+  </footer>
+
+  <script>
+    // Intro
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('intro').classList.add('hidden');
+      }, 1900);
+    });
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        ring.style.left = e.clientX + 'px';
+        ring.style.top = e.clientY + 'px';
+      }, 80);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
